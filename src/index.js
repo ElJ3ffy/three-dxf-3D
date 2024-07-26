@@ -146,10 +146,14 @@ export function Viewer(data, parent, width, height, font) {
         }
     };
 
-    var camera = new THREE.OrthographicCamera(viewPort.left, viewPort.right, viewPort.top, viewPort.bottom, 1, 19);
-    camera.position.z = 10;
-    camera.position.x = viewPort.center.x;
-    camera.position.y = viewPort.center.y;
+    // var camera = new THREE.OrthographicCamera(viewPort.left, viewPort.right, viewPort.top, viewPort.bottom, 1, 19);
+    // camera.position.z = 10;
+    // camera.position.x = viewPort.center.x;
+    // camera.position.y = viewPort.center.y;
+
+    const camera = new THREE.PerspectiveCamera( 60, aspectRatio, 1, 1000 );
+    camera.position.set( viewPort.center.x, viewPort.center.y, 300 );
+
 
     var renderer = this.renderer = new THREE.WebGLRenderer();
     renderer.setSize(width, height);
@@ -160,6 +164,10 @@ export function Viewer(data, parent, width, height, font) {
 
     //TODO: Need to make this an option somehow so others can roll their own controls.
     var controls = new OrbitControls(camera, parent);
+    controls.minDistance = 100;
+	controls.maxDistance = 500;
+    // controls.maxPolarAngle = Math.PI / 2;
+
     controls.target.x = camera.position.x;
     controls.target.y = camera.position.y;
     controls.target.z = 0;
@@ -174,6 +182,8 @@ export function Viewer(data, parent, width, height, font) {
     controls.update();
 
     this.resize = function (width, height) {
+        // set new aspect ratio
+        // run camera.updateProjectionMatrix();
         var originalWidth = renderer.domElement.width;
         var originalHeight = renderer.domElement.height;
 
@@ -186,7 +196,7 @@ export function Viewer(data, parent, width, height, font) {
         camera.left = (hscale * camera.left);
         camera.right = (hscale * camera.right);
 
-        //        camera.updateProjectionMatrix();
+        camera.updateProjectionMatrix();
 
         renderer.setSize(width, height);
         renderer.setClearColor(0xfffffff, 1);
@@ -471,7 +481,7 @@ export function Viewer(data, parent, width, height, font) {
                 points.push.apply(points, bulgePoints);
             } else {
                 vertex = entity.vertices[i];
-                points.push(new THREE.Vector3(vertex.x, vertex.y, 0));
+                points.push(new THREE.Vector3(vertex.x, vertex.y, vertex.z));
             }
 
         }
